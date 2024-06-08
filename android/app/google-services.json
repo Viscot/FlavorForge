@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "943630585933",
+    "project_id": "flavorforge-ac857",
+    "storage_bucket": "flavorforge-ac857.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:943630585933:android:2245ed63539818251f4c04",
+        "android_client_info": {
+          "package_name": "com.flavorforge.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAn7Dw5Mxr_wbX9x12VJK5CtEnMT6036Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

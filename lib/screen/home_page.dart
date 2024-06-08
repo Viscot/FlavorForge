@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'login_page.dart'; // Import LoginPage
-import 'register_page.dart'; // Import RegisterPage
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,6 +10,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isRegistered = false; // Definisikan variabel isRegistered
+  String? username; // Variabel untuk menyimpan nama pengguna
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,8 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
             },
           ),
+          // Tampilkan teks "Guest" atau nama pengguna berdasarkan status login
+          Text(isRegistered ? username ?? "Guest" : "Guest"),
         ],
       ),
       body: SingleChildScrollView(
