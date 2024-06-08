@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'login_page.dart'; // Import LoginPage
 import 'package:firebase_auth/firebase_auth.dart';
+import '../recipes/featured_recipe_widget.dart';
+import '../recipes/customer_reviews_widget.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,17 +19,20 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Flavor Forge'),
-        backgroundColor: Colors.blue,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {
-              // Tambahkan logika navigasi ke halaman login
-              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
-            },
+          Row(
+            children: [
+              Text(isRegistered ? username ?? "Guest" : "Guest"),
+              IconButton(
+                icon: Icon(Icons.person),
+                onPressed: () {
+                  // Tambahkan logika navigasi ke halaman login
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                },
+              ),
+            ],
           ),
-          // Tampilkan teks "Guest" atau nama pengguna berdasarkan status login
-          Text(isRegistered ? username ?? "Guest" : "Guest"),
+          SizedBox(width: 16), // Menambahkan jarak ke kanan layar
         ],
       ),
       body: SingleChildScrollView(
@@ -40,19 +45,11 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 32),
               SectionTitle(title: 'Feature Recipe'),
               SizedBox(height: 16),
-              FeatureRecipeCard(
-                title: 'Special Recipe',
-                description: 'This is a special recipe.',
-                imageUrl: 'https://via.placeholder.com/300',
-              ),
-              SizedBox(height: 32),
-              SectionTitle(title: 'Popular Recipes'),
-              SizedBox(height: 16),
-              PopularRecipes(),
+              FeaturedRecipeWidget(),
               SizedBox(height: 32),
               SectionTitle(title: 'Customer Recipes'),
               SizedBox(height: 16),
-              CustomerRecipes(),
+              CustomerReviewsWidget(),
             ],
           ),
         ),
@@ -153,120 +150,6 @@ class _DiscoverNewRecipesState extends State<DiscoverNewRecipes> {
           }).toList(),
         ),
       ],
-    );
-  }
-}
-
-class PopularRecipes extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        RecipeCard(
-          imageUrl: 'https://via.placeholder.com/150',
-        ),
-        RecipeCard(
-          imageUrl: 'https://via.placeholder.com/150',
-        ),
-        RecipeCard(
-          imageUrl: 'https://via.placeholder.com/150',
-        ),
-      ],
-    );
-  }
-}
-
-class CustomerRecipes extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        RecipeCard(
-          imageUrl: 'https://via.placeholder.com/150',
-        ),
-        RecipeCard(
-          imageUrl: 'https://via.placeholder.com/150',
-        ),
-        RecipeCard(
-          imageUrl: 'https://via.placeholder.com/150',
-        ),
-      ],
-    );
-  }
-}
-
-class RecipeCard extends StatelessWidget {
-  final String imageUrl;
-
-  RecipeCard({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 10.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          imageUrl,
-          height: 200,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-}
-
-class FeatureRecipeCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String imageUrl;
-
-  FeatureRecipeCard({
-    required this.title,
-    required this.description,
-    required this.imageUrl,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.network(
-              imageUrl,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(description),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
