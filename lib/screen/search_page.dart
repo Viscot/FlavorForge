@@ -1,7 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(SearchPage());
+}
+
+class Recipe {
+  final String title;
+  final String description;
+  final String imageUrl;
+  final String creator;
+
+  Recipe({
+    required this.title,
+    required this.description,
+    required this.imageUrl,
+    required this.creator,
+  });
 }
 
 class SearchPage extends StatefulWidget {
@@ -10,32 +25,73 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  List<Recipe> searchResults = [];
   List<String> searchHistory = [];
 
-  void updateSearchQuery(String query) {
+  @override
+  void initState() {
+    super.initState();
+    loadSearchHistory();
+  }
+
+  void loadSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      searchHistory.add(query);
+      searchHistory = prefs.getStringList('searchHistory') ?? [];
     });
   }
 
-  void clearSearchHistory() {
+  void saveSearchHistory(String query) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!searchHistory.contains(query)) {
+      searchHistory.insert(0, query);
+      prefs.setStringList('searchHistory', searchHistory);
+    }
+  }
+
+  void removeFromSearchHistory(String query) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      searchHistory.remove(query);
+      prefs.setStringList('searchHistory', searchHistory);
+    });
+  }
+
+  void clearSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
       searchHistory.clear();
+      prefs.setStringList('searchHistory', searchHistory);
+    });
+  }
+
+  void updateSearchQuery(String query) {
+    setState(() {
+      searchResults = [
+        Recipe(
+          title: "Gado gado",
+          description: "Gado-gado adalah salah satu makanan khas Indonesia.",
+          imageUrl: "https://example.com/gadogado.jpg",
+          creator: "User123",
+        ),
+        Recipe(
+          title: "Nasi Goreng",
+          description: "Nasi Goreng adalah makanan khas Indonesia yang lezat.",
+          imageUrl: "https://example.com/nasigoreng.jpg",
+          creator: "Chef456",
+        ),
+      ].where((recipe) => recipe.title.toLowerCase().contains(query.toLowerCase())).toList();
+      saveSearchHistory(query);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Search Page'),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.clear),
-              onPressed: clearSearchHistory,
-            ),
-          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,12 +100,14 @@ class _SearchPageState extends State<SearchPage> {
               padding: const EdgeInsets.all(20.0),
               child: SearchBox(
                 onSearch: updateSearchQuery,
+                searchHistory: searchHistory,
+                removeFromSearchHistory: removeFromSearchHistory,
+                clearSearchHistory: clearSearchHistory,
               ),
             ),
             Expanded(
               child: SearchResult(
-                searchHistory: searchHistory,
-                onSearch: updateSearchQuery,
+                searchResults: searchResults,
               ),
             ),
           ],
@@ -61,8 +119,16 @@ class _SearchPageState extends State<SearchPage> {
 
 class SearchBox extends StatefulWidget {
   final Function(String) onSearch;
+  final List<String> searchHistory;
+  final Function(String) removeFromSearchHistory;
+  final Function() clearSearchHistory;
 
-  SearchBox({required this.onSearch});
+  SearchBox({
+    required this.onSearch,
+    required this.searchHistory,
+    required this.removeFromSearchHistory,
+    required this.clearSearchHistory,
+  });
 
   @override
   _SearchBoxState createState() => _SearchBoxState();
@@ -72,27 +138,68 @@ class _SearchBoxState extends State<SearchBox> {
   TextEditingController _textEditingController = TextEditingController();
   String hintText = "Cari resep makanan";
 
+  Widget buildSearchHistory() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'History:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 5),
+        ...widget.searchHistory.map((query) {
+          return ListTile(
+            title: Text(
+              query,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                widget.removeFromSearchHistory(query);
+              },
+            ),
+            onTap: () {
+              _textEditingController.text = query;
+              widget.onSearch(query);
+            },
+          );
+        }).toList(),
+        SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: widget.clearSearchHistory,
+          child: Text('Clear History'),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _textEditingController,
-      decoration: InputDecoration(
-        hintText: hintText,
-        suffixIcon: IconButton(
-          icon: Icon(Icons.search),
-          onPressed: () {
-            String query = _textEditingController.text;
-            if (query.isNotEmpty) {
-              widget.onSearch(query);
-            }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _textEditingController,
+          decoration: InputDecoration(
+            hintText: hintText,
+            suffixIcon: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                String query = _textEditingController.text;
+                widget.onSearch(query);
+              },
+            ),
+          ),
+          onTap: () {
+            setState(() {
+              hintText = "Contoh 'gado gado'";
+            });
           },
         ),
-      ),
-      onTap: () {
-        setState(() {
-          hintText = "Contoh 'gado gado'";
-        });
-      },
+        SizedBox(height: 10),
+        if (widget.searchHistory.isNotEmpty) buildSearchHistory(),
+      ],
     );
   }
 
@@ -104,42 +211,31 @@ class _SearchBoxState extends State<SearchBox> {
 }
 
 class SearchResult extends StatelessWidget {
-  final List<String> searchHistory;
-  final Function(String) onSearch;
+  final List<Recipe> searchResults;
 
-  SearchResult({required this.searchHistory, required this.onSearch});
+  SearchResult({required this.searchResults});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: searchHistory.length,
-      itemBuilder: (context, index) {
-        String query = searchHistory[index];
-        return ListTile(
-          title: Text(query),
-          onTap: () {
-            onSearch(query);
-          },
-          trailing: IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              searchHistory.removeAt(index);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Pencarian '$query' dihapus dari riwayat."),
-                  action: SnackBarAction(
-                    label: 'Batalkan',
-                    onPressed: () {
-                      searchHistory.insert(index, query);
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                  ),
-                ),
+    return searchResults.isNotEmpty
+        ? ListView.builder(
+            itemCount: searchResults.length,
+            itemBuilder: (context, index) {
+              Recipe recipe = searchResults[index];
+              return ListTile(
+                title: Text(recipe.title),
+                subtitle: Text(recipe.description),
+                leading: Image.network(recipe.imageUrl),
+                trailing: Text("By ${recipe.creator}"),
+                onTap: () {
+                  // Tambahkan logika untuk menangani ketika resep makanan dipilih
+                  // Misalnya, Anda dapat menampilkan detail resep.
+                },
               );
             },
-          ),
-        );
-      },
-    );
+          )
+        : Center(
+            child: Text("Tidak ditemukan"),
+          );
   }
 }
