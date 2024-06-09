@@ -27,6 +27,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   List<Recipe> searchResults = [];
   List<String> searchHistory = [];
+  bool hasSearched = false;
 
   @override
   void initState() {
@@ -67,6 +68,7 @@ class _SearchPageState extends State<SearchPage> {
 
   void updateSearchQuery(String query) {
     setState(() {
+      hasSearched = true;
       searchResults = [
         Recipe(
           title: "Gado gado",
@@ -108,6 +110,7 @@ class _SearchPageState extends State<SearchPage> {
             Expanded(
               child: SearchResult(
                 searchResults: searchResults,
+                hasSearched: hasSearched,
               ),
             ),
           ],
@@ -137,6 +140,7 @@ class SearchBox extends StatefulWidget {
 class _SearchBoxState extends State<SearchBox> {
   TextEditingController _textEditingController = TextEditingController();
   String hintText = "Cari resep makanan";
+  bool showHistory = false;
 
   Widget buildSearchHistory() {
     return Column(
@@ -162,6 +166,9 @@ class _SearchBoxState extends State<SearchBox> {
             onTap: () {
               _textEditingController.text = query;
               widget.onSearch(query);
+              setState(() {
+                showHistory = false;
+              });
             },
           );
         }).toList(),
@@ -188,17 +195,32 @@ class _SearchBoxState extends State<SearchBox> {
               onPressed: () {
                 String query = _textEditingController.text;
                 widget.onSearch(query);
+                setState(() {
+                  showHistory = false;
+                });
               },
             ),
           ),
           onTap: () {
             setState(() {
               hintText = "Contoh 'gado gado'";
+              showHistory = false;
             });
           },
         ),
         SizedBox(height: 10),
-        if (widget.searchHistory.isNotEmpty) buildSearchHistory(),
+        if (widget.searchHistory.isNotEmpty)
+          ExpansionTile(
+            title: Text("Show Search History"),
+            onExpansionChanged: (expanded) {
+              setState(() {
+                showHistory = expanded;
+              });
+            },
+            children: [
+              if (showHistory) buildSearchHistory(),
+            ],
+          ),
       ],
     );
   }
@@ -212,30 +234,33 @@ class _SearchBoxState extends State<SearchBox> {
 
 class SearchResult extends StatelessWidget {
   final List<Recipe> searchResults;
+  final bool hasSearched;
 
-  SearchResult({required this.searchResults});
+  SearchResult({required this.searchResults, required this.hasSearched});
 
   @override
   Widget build(BuildContext context) {
-    return searchResults.isNotEmpty
-        ? ListView.builder(
-            itemCount: searchResults.length,
-            itemBuilder: (context, index) {
-              Recipe recipe = searchResults[index];
-              return ListTile(
-                title: Text(recipe.title),
-                subtitle: Text(recipe.description),
-                leading: Image.network(recipe.imageUrl),
-                trailing: Text("By ${recipe.creator}"),
-                onTap: () {
-                  // Tambahkan logika untuk menangani ketika resep makanan dipilih
-                  // Misalnya, Anda dapat menampilkan detail resep.
+    return hasSearched
+        ? searchResults.isNotEmpty
+            ? ListView.builder(
+                itemCount: searchResults.length,
+                itemBuilder: (context, index) {
+                  Recipe recipe = searchResults[index];
+                  return ListTile(
+                    title: Text(recipe.title),
+                    subtitle: Text(recipe.description),
+                    leading: Image.network(recipe.imageUrl),
+                    trailing: Text("By ${recipe.creator}"),
+                    onTap: () {
+                      // Tambahkan logika untuk menangani ketika resep makanan dipilih
+                      // Misalnya, Anda dapat menampilkan detail resep.
+                    },
+                  );
                 },
-              );
-            },
-          )
-        : Center(
-            child: Text("Tidak ditemukan"),
-          );
+              )
+            : Center(
+                child: Text("Tidak ditemukan"),
+              )
+        : Container();
   }
 }

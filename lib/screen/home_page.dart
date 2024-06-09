@@ -4,6 +4,7 @@ import 'login_page.dart'; // Import LoginPage
 import 'package:firebase_auth/firebase_auth.dart';
 import '../recipes/featured_recipe_widget.dart';
 import '../recipes/customer_reviews_widget.dart';
+import '../recipes/trending_recipe_widget.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -47,6 +48,9 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 16),
               FeaturedRecipeWidget(),
               SizedBox(height: 32),
+              SectionTitle(title: 'Trending Recipes'),
+              SizedBox(height: 32),
+              TrendingRecipesWidget(),
               SectionTitle(title: 'Customer Recipes'),
               SizedBox(height: 16),
               CustomerReviewsWidget(),
