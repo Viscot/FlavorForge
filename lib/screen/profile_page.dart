@@ -136,12 +136,10 @@ class _ProfileBodyState extends State<ProfileBody> {
                   'Ingredients:',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: newIngredients.length,
-                  itemBuilder: (BuildContext context, int ingredientIndex) {
-                    return Text('- ' + newIngredients[ingredientIndex]);
-                  },
+                Column(
+                  children: newIngredients.map((ingredient) {
+                    return Text('- ' + ingredient);
+                  }).toList(),
                 ),
                 SizedBox(height: 10),
                 ElevatedButton(
@@ -164,33 +162,33 @@ class _ProfileBodyState extends State<ProfileBody> {
   }
 
   Future<void> _openDeleteRecipeDialog(int index) async {
-  return showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Delete Recipe'),
-        content: Text('Are you sure you want to delete this recipe?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _myRecipes.removeAt(index);
-              });
-              Navigator.of(context).pop();
-            },
-            child: Text('Delete'),
-          ),
-        ],
-      );
-    },
-  );
-}
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Recipe'),
+          content: Text('Are you sure you want to delete this recipe?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _myRecipes.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,11 +289,22 @@ class _ProfileBodyState extends State<ProfileBody> {
                       Text('Likes: ${_myRecipes[index]['likes']}'),
                     ],
                   ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      _openEditRecipeDialog(index);
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          _openEditRecipeDialog(index);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          _openDeleteRecipeDialog(index);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               );

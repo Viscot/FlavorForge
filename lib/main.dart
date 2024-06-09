@@ -42,7 +42,7 @@ class _MainPageState extends State<MainPage> {
     SearchPage(),
     FavoritePage(),
     UploadPage(),
-    ProfilePage(),
+    ProfileBody(),
   ];
 
   void _onItemTapped(int index) {
