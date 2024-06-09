@@ -20,14 +20,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Flavor Forge'),
+        backgroundColor: Colors.deepOrange,
         actions: <Widget>[
           Row(
             children: [
-              Text(isRegistered ? username ?? "Guest" : "Guest"),
+              Text(
+                isRegistered ? username ?? "Guest" : "Guest",
+                style: TextStyle(color: Colors.white, fontSize: 16.0),
+              ),
               IconButton(
                 icon: Icon(Icons.person),
                 onPressed: () {
-                  // Tambahkan logika navigasi ke halaman login
                   Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                 },
               ),
@@ -49,8 +52,9 @@ class _HomePageState extends State<HomePage> {
               FeaturedRecipeWidget(),
               SizedBox(height: 32),
               SectionTitle(title: 'Trending Recipes'),
-              SizedBox(height: 32),
+              SizedBox(height: 16),
               TrendingRecipesWidget(),
+              SizedBox(height: 32),
               SectionTitle(title: 'Customer Recipes'),
               SizedBox(height: 16),
               CustomerReviewsWidget(),
@@ -74,7 +78,7 @@ class SectionTitle extends StatelessWidget {
       style: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.bold,
-        color: Colors.blue,
+        color: Colors.deepOrange,
       ),
     );
   }
@@ -90,9 +94,9 @@ class _DiscoverNewRecipesState extends State<DiscoverNewRecipes> {
   int _current = 0;
 
   final List<Map<String, String>> recipes = [
-    {'imageUrl': 'https://akcdn.detik.net.id/visual/2023/06/07/ilustrasi-ayam-serundeng_169.jpeg?w=650'},
-    {'imageUrl': 'https://kecipir.com/blog/wp-content/uploads/2023/03/resep-gado-gado.jpg'},
-    {'imageUrl': 'https://asset.kompas.com/crops/7tBNI9-TCa-oOq8tQTahf0ua1fg=/0x0:968x645/750x500/data/photo/2021/01/27/6010ce2cc1805.jpg'},
+    {'imageUrl': 'https://akcdn.detik.net.id/visual/2023/06/07/ilustrasi-ayam-serundeng_169.jpeg?w=650', 'title': 'Ayam Serundeng'},
+    {'imageUrl': 'https://kecipir.com/blog/wp-content/uploads/2023/03/resep-gado-gado.jpg', 'title': 'Gado-Gado'},
+    {'imageUrl': 'https://asset.kompas.com/crops/7tBNI9-TCa-oOq8tQTahf0ua1fg=/0x0:968x645/750x500/data/photo/2021/01/27/6010ce2cc1805.jpg', 'title': 'Soto Ayam'},
   ];
 
   @override
@@ -108,11 +112,32 @@ class _DiscoverNewRecipesState extends State<DiscoverNewRecipes> {
                   margin: EdgeInsets.symmetric(horizontal: 5.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16.0),
-                    child: Image.network(
-                      recipe['imageUrl']!,
-                      height: 300,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          recipe['imageUrl']!,
+                          height: 300,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                            color: Colors.black.withOpacity(0.5),
+                            child: Text(
+                              recipe['title']!,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -139,14 +164,14 @@ class _DiscoverNewRecipesState extends State<DiscoverNewRecipes> {
             return GestureDetector(
               onTap: () => _carouselController.animateToPage(entry.key),
               child: Container(
-                width: 8.0,
-                height: 8.0,
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                width: 12.0,
+                height: 12.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: (Theme.of(context).brightness == Brightness.dark
                           ? Colors.white
-                          : Colors.blue)
+                          : Colors.deepOrange)
                       .withOpacity(_current == entry.key ? 0.9 : 0.4),
                 ),
               ),

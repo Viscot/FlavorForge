@@ -13,13 +13,12 @@ class FeaturedRecipeWidget extends StatelessWidget {
     Recipe(name: 'Spaghetti Carbonara', imageUrl: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/0346a29a89ef229b1a0ff9697184f944/Derivates/cb5051204f4a4525c8b013c16418ae2904e737b7.jpg', description: 'Delicious spaghetti with creamy sauce and bacon.'),
     Recipe(name: 'Chicken Alfredo', imageUrl: 'https://www.budgetbytes.com/wp-content/uploads/2022/07/Chicken-Alfredo-above-500x500.jpg', description: 'Creamy pasta dish with chicken and parmesan cheese.'),
     Recipe(name: 'Margherita Pizza', imageUrl: 'https://kitchenswagger.com/wp-content/uploads/2023/05/margherita-pizza-close.jpg', description: 'Classic Italian pizza with tomatoes, mozzarella, and basil.'),
-    Recipe(name: 'Caesar Salad', imageUrl: 'https://heartbeetkitchen.com/foodblog/wp-content/uploads/2022/06/ultimate-grilled-chicken-caesar-salad.jpg', description: 'Fresh salad with romaine lettuce, croutons, parmesan cheese, and Caesar dressing.'),
-    Recipe(name: 'Tacos', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-O-lOivV3yivl1ggvEVVH28EMmhLnxe2Pqg&s', description: 'Mexican dish consisting of corn or wheat tortillas folded or rolled around a filling.'),
-    Recipe(name: 'Sushi', imageUrl: 'https://example.com/sushi.jpg', description: 'Japanese dish consisting of vinegared rice combined with various ingredients such as seafood, vegetables, and occasionally tropical fruits.'),
-    Recipe(name: 'Pancakes', imageUrl: 'https://example.com/pancakes.jpg', description: 'Flat cake, often thin and round, prepared from a starch-based batter that may contain eggs, milk, and butter.'),
-    Recipe(name: 'Burger', imageUrl: 'https://example.com/burger.jpg', description: 'Sandwich consisting of a cooked patty of ground meat, usually beef, placed inside a sliced bread roll or bun.'),
-    Recipe(name: 'Lasagna', imageUrl: 'https://example.com/lasagna.jpg', description: 'Pasta dish made with several layers of lasagna sheets alternating with sauces and various other ingredients such as meats, vegetables, and cheese.'),
-    Recipe(name: 'Ice Cream', imageUrl: 'https://example.com/icecream.jpg', description: 'Sweetened frozen food typically eaten as a snack or dessert.'),
+    Recipe(name: 'Caesar Salad', imageUrl: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/b89f8de9-0f93-4976-b318-9ab04db353bc/Derivates/d3a08a3c-abb2-452e-9121-168f67c992c8.jpg', description: 'Fresh salad with romaine lettuce, croutons, parmesan cheese, and Caesar dressing.'),
+    Recipe(name: 'Tacos', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-O-lOivV3yivl1ggvEVVH28EMmhLnxe2Pqg&s', description: 'Mexican dish consisting of corn or wheat tortillas folded or rolled around a filling.'),  
+    Recipe(name: 'Pancakes', imageUrl: 'https://lilluna.com/wp-content/uploads/2022/09/easy-pancakes3-resize-10.jpg', description: 'Flat cake, often thin and round, prepared from a starch-based batter that may contain eggs, milk, and butter.'),
+    Recipe(name: 'Burger', imageUrl: 'https://asset.kompas.com/crops/fP_Q5TD9BOn5G5JTnntgtDIjQMI=/53x36:933x623/750x500/data/photo/2021/10/21/6171492e1ea12.jpg', description: 'Sandwich consisting of a cooked patty of ground meat, usually beef, placed inside a sliced bread roll or bun.'),
+    Recipe(name: 'Lasagna', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpux-NQlZHkLpPgRhJW3cMo6XKOzosMhCIEw&s', description: 'Pasta dish made with several layers of lasagna sheets alternating with sauces and various other ingredients such as meats, vegetables, and cheese.'),
+    Recipe(name: 'Ice Cream', imageUrl: 'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-44893_12-ab2de24.jpg', description: 'Sweetened frozen food typically eaten as a snack or dessert.'),
   ];
 
   @override

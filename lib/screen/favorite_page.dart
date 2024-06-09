@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -36,10 +39,10 @@ class Recipe {
 class FavoritePage extends StatelessWidget {
   final List<Recipe> favoriteRecipes = [
     Recipe(
-      title: 'Gado gado',
+      title: 'Gado gado Entong',
       description: 'Gado-gado adalah salah satu makanan khas Indonesia.',
-      imageUrl: 'https://example.com/gadogado.jpg',
-      creator: 'User123',
+      imageUrl: 'https://nibble-images.b-cdn.net/nibble/original_images/gado_gado_enak_di_jakarta_03_515ab09c9d.jpg',
+      creator: 'Entong ganteng',
       ingredients: [
         '100g lontong',
         '50g kacang tanah',
@@ -56,10 +59,10 @@ class FavoritePage extends StatelessWidget {
       ],
     ),
     Recipe(
-      title: 'Nasi Goreng',
+      title: 'Nasi Goreng Toyib',
       description: 'Nasi Goreng adalah makanan khas Indonesia yang lezat.',
       imageUrl: 'https://example.com/nasigoreng.jpg',
-      creator: 'Chef456',
+      creator: 'Toyib cakep',
       ingredients: [
         '2 cups cooked rice',
         '2 tablespoons oil',
@@ -88,13 +91,26 @@ class FavoritePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Favorites'),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepOrange, Colors.orangeAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: ListView.builder(
         itemCount: favoriteRecipes.length,
         itemBuilder: (context, index) {
           final recipe = favoriteRecipes[index];
           return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
             margin: EdgeInsets.all(10.0),
+            elevation: 5.0,
             child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -105,11 +121,20 @@ class FavoritePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.network(
-                    recipe.imageUrl,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                  Hero(
+                    tag: recipe.imageUrl,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15.0),
+                        topRight: Radius.circular(15.0),
+                      ),
+                      child: Image.network(
+                        recipe.imageUrl,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -170,13 +195,28 @@ class RecipeDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(recipe.title),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepOrange, Colors.orangeAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(recipe.imageUrl),
+            Hero(
+              tag: recipe.imageUrl,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15.0),
+                child: Image.network(recipe.imageUrl),
+              ),
+            ),
             SizedBox(height: 16.0),
             Text(
               recipe.title,

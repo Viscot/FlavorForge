@@ -10,95 +10,153 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-        backgroundColor: Colors.blue,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
+      body: Stack(
+        children: [
+          // Latar belakang gambar
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/background.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // Overlay warna dengan sedikit transparansi
+          Container(
+            color: Colors.black.withOpacity(0.5),
+          ),
+          // Konten login
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Welcome Back',
+                            style: TextStyle(
+                              fontSize: 32.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'Please login to your account',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 32.0),
+                    TextField(
+                      controller: usernameController,
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: TextStyle(color: Colors.white),
+                        prefixIcon: Icon(Icons.person, color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.3),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 16.0),
+                    TextField(
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.white),
+                        prefixIcon: Icon(Icons.lock, color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.3),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      obscureText: true,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        _signInWithUsernameAndPassword(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                      ),
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8.0),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterPage()),
+                        );
+                      },
+                      child: Text(
+                        'Belum punya akun? Daftar di sini',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: usernameController,
-                decoration: InputDecoration(
-                  labelText: 'Username',
-                  prefixIcon: Icon(Icons.person),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  _signInWithUsernameAndPassword(context);
-                },
-                child: Text('Login'),
-              ),
-              SizedBox(height: 8.0),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
-                  );
-                },
-                child: Text('Belum punya akun? Daftar di sini'),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   Future<void> _signInWithUsernameAndPassword(BuildContext context) async {
-  try {
-    final String username = usernameController.text.trim();
-    final String password = passwordController.text.trim();
+    try {
+      final String username = usernameController.text.trim();
+      final String password = passwordController.text.trim();
 
-    // Langsung menggunakan username sebagai bagian dari email
-    final UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: '$username', // Menggunakan username langsung sebagai email
-      password: password,
-    );
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: '$username',
+        password: password,
+      );
 
-    // Jika autentikasi berhasil, lanjutkan ke halaman berikutnya
-    final User? user = userCredential.user;
-    if (user != null) {
-      // Navigasi ke halaman berikutnya
-      // Misalnya, Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NextPage()));
+      final User? user = userCredential.user;
+      if (user != null) {
+        // Navigasi ke halaman berikutnya
+        // Misalnya, Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NextPage()));
+      }
+    } catch (e) {
+      print('Error signing in: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error signing in: $e'),
+      ));
     }
-  } catch (e) {
-    // Tangani kesalahan autentikasi di sini, misalnya tampilkan pesan kesalahan
-    print('Error signing in: $e');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Error signing in: $e'),
-    ));
   }
-}
 }

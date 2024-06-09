@@ -2,7 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(SearchPage());
+  runApp(SearchApp());
+}
+
+class SearchApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: SearchPage(),
+    );
+  }
 }
 
 class Recipe {
@@ -71,16 +85,16 @@ class _SearchPageState extends State<SearchPage> {
       hasSearched = true;
       searchResults = [
         Recipe(
-          title: "Gado gado",
+          title: "Gado gado Entong",
           description: "Gado-gado adalah salah satu makanan khas Indonesia.",
-          imageUrl: "https://example.com/gadogado.jpg",
-          creator: "User123",
+          imageUrl: "https://cdn0-production-images-kly.akamaized.net/LCd7mzw6FM63ysIIv7K2Kde8kUE=/500x281/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/2413676/original/011486100_1542811444-Gado_gado.jpg",
+          creator: "Entong ganteng",
         ),
         Recipe(
-          title: "Nasi Goreng",
+          title: "Nasi Goreng Bang Toyib",
           description: "Nasi Goreng adalah makanan khas Indonesia yang lezat.",
-          imageUrl: "https://example.com/nasigoreng.jpg",
-          creator: "Chef456",
+          imageUrl: "https://www.masakapahariini.com/wp-content/uploads/2021/07/Nasi-Goreng-Spesial-Ayam-Kecombrang.jpg",
+          creator: "Toyib cakep",
         ),
       ].where((recipe) => recipe.title.toLowerCase().contains(query.toLowerCase())).toList();
       saveSearchHistory(query);
@@ -89,32 +103,29 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Search Page'),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SearchBox(
-                onSearch: updateSearchQuery,
-                searchHistory: searchHistory,
-                removeFromSearchHistory: removeFromSearchHistory,
-                clearSearchHistory: clearSearchHistory,
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Search Page'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SearchBox(
+              onSearch: updateSearchQuery,
+              searchHistory: searchHistory,
+              removeFromSearchHistory: removeFromSearchHistory,
+              clearSearchHistory: clearSearchHistory,
             ),
-            Expanded(
-              child: SearchResult(
-                searchResults: searchResults,
-                hasSearched: hasSearched,
-              ),
+          ),
+          Expanded(
+            child: SearchResult(
+              searchResults: searchResults,
+              hasSearched: hasSearched,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -246,15 +257,22 @@ class SearchResult extends StatelessWidget {
                 itemCount: searchResults.length,
                 itemBuilder: (context, index) {
                   Recipe recipe = searchResults[index];
-                  return ListTile(
-                    title: Text(recipe.title),
-                    subtitle: Text(recipe.description),
-                    leading: Image.network(recipe.imageUrl),
-                    trailing: Text("By ${recipe.creator}"),
-                    onTap: () {
-                      // Tambahkan logika untuk menangani ketika resep makanan dipilih
-                      // Misalnya, Anda dapat menampilkan detail resep.
-                    },
+                  return Card(
+                    margin: EdgeInsets.all(10.0),
+                    child: ListTile(
+                      title: Text(recipe.title),
+                      subtitle: Text(recipe.description),
+                      leading: Image.network(recipe.imageUrl),
+                      trailing: Text("By ${recipe.creator}"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RecipeDetailPage(recipe: recipe),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               )
@@ -262,5 +280,44 @@ class SearchResult extends StatelessWidget {
                 child: Text("Tidak ditemukan"),
               )
         : Container();
+  }
+}
+
+class RecipeDetailPage extends StatelessWidget {
+  final Recipe recipe;
+
+  RecipeDetailPage({required this.recipe});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(recipe.title),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(recipe.imageUrl),
+            SizedBox(height: 16.0),
+            Text(
+              recipe.title,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              recipe.description,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              'By ${recipe.creator}',
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
