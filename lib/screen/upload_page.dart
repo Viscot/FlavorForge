@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -321,3 +322,5 @@ class _UploadPageState extends State<UploadPage>
     );
   }
 }
+=======
+>>>>>>> d790979a9c28cf91d784d1936a9d515f14adc6d8
