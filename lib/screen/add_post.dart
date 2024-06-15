@@ -220,3 +220,4 @@ class _AddPostState extends State<AddPost> {
     );
   }
 }
+
