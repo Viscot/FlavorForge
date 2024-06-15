@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:943630585933:android:2245ed63539818251f4c04",
         "android_client_info": {
-          "package_name": "com.flavorforge.app"
+          "package_name": "com.example.flavorforge"
         }
       },
       "oauth_client": [],
