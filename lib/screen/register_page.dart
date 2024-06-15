@@ -12,6 +12,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String _selectedGender = 'Laki-laki'; // Default value
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _usernameController,
                       decoration: InputDecoration(
                         labelText: 'Username',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         prefixIcon: Icon(Icons.person, color: Colors.white),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.3),
@@ -76,14 +77,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                     SizedBox(height: 16.0),
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         prefixIcon: Icon(Icons.email, color: Colors.white),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.3),
@@ -92,14 +93,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                     SizedBox(height: 16.0),
                     TextField(
                       controller: _phoneNumberController,
                       decoration: InputDecoration(
                         labelText: 'Phone Number',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         prefixIcon: Icon(Icons.phone, color: Colors.white),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.3),
@@ -108,14 +109,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                     SizedBox(height: 16.0),
                     TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         prefixIcon: Icon(Icons.lock, color: Colors.white),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.3),
@@ -125,7 +126,33 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       obscureText: true,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    SizedBox(height: 16.0),
+                    DropdownButtonFormField<String>(
+                      value: _selectedGender,
+                      items: <String>['Laki-laki', 'Perempuan']
+                          .map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedGender = newValue!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.wc, color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.3),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.black),
                     ),
                     SizedBox(height: 16.0),
                     ElevatedButton(
@@ -159,24 +186,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _register(BuildContext context) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      
-      // Save additional user data to Firestore
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
         'username': _usernameController.text,
         'email': _emailController.text,
         'phoneNumber': _phoneNumberController.text,
+        'jenis_kelamin': _selectedGender
       });
-      
+
       // Navigate to login page after successful registration
-      Navigator.pushReplacementNamed(context, '/login');
-      
-      print('Registration successful: ${userCredential.user!.uid}');
+      Navigator.pop(context, '/login');
     } catch (e) {
-      print('Registration failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Registration failed: $e'),
       ));
