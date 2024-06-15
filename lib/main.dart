@@ -1,3 +1,4 @@
+import 'package:flavorforge/global.dart';
 import 'package:flutter/material.dart';
 import 'screen/home_page.dart';
 import 'screen/favorite_page.dart';
@@ -6,7 +7,6 @@ import 'screen/profile_page.dart';
 import 'screen/search_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MainPage(),
-      debugShowCheckedModeBanner: false,  // Menyembunyikan banner debug
+      debugShowCheckedModeBanner: false, // Menyembunyikan banner debug
     );
   }
 }
@@ -45,10 +45,19 @@ class _MainPageState extends State<MainPage> {
     ProfileBody(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _onItemTapped(int index) async {
+    if (index == 2 || index == 3 || index == 4) {
+      var isLogin = await checkLogin();
+      if (isLogin) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      }
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override

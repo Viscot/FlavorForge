@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flavorforge/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -60,7 +63,7 @@ class LoginPage extends StatelessWidget {
                     TextField(
                       controller: usernameController,
                       decoration: InputDecoration(
-                        labelText: 'Username',
+                        labelText: 'Email',
                         labelStyle: TextStyle(color: Colors.white),
                         prefixIcon: Icon(Icons.person, color: Colors.white),
                         filled: true,
@@ -114,7 +117,8 @@ class LoginPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => RegisterPage()),
+                          MaterialPageRoute(
+                              builder: (context) => RegisterPage()),
                         );
                       },
                       child: Text(
@@ -143,19 +147,42 @@ class LoginPage extends StatelessWidget {
 
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: '$username',
+        email: username,
         password: password,
       );
 
       final User? user = userCredential.user;
       if (user != null) {
-        // Navigasi ke halaman berikutnya
-        // Misalnya, Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NextPage()));
+        // Ambil data pengguna dari Firestore
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        // Simpan data pengguna ke SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('login', true);
+        await prefs.setString('userEmail', user.email!);
+        await prefs.setString('username', userDoc['username']);
+        await prefs.setString('phoneNumber', userDoc['phoneNumber']);
+        await prefs.setString('jenis_kelamin', userDoc['jenis_kelamin']);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Success login"),
+          backgroundColor: Colors.green,
+        ));
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainPage(),
+            ),
+            (route) => false);
       }
     } catch (e) {
       print('Error signing in: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error signing in: $e'),
+        backgroundColor: Colors.red,
       ));
     }
   }
