@@ -79,10 +79,9 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           Expanded(
-            child: SearchResult(
-              searchResults: searchResults,
-              hasSearched: hasSearched,
-            ),
+            child: hasSearched
+                ? SearchResult(searchQuery: searchQuery)
+                : Center(child: Text("Search for recipes", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
           ),
         ],
       ),
@@ -221,73 +220,51 @@ class SearchResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return hasSearched
-        ? searchResults.isNotEmpty
-            ? ListView.builder(
-                itemCount: searchResults.length,
-                itemBuilder: (context, index) {
-                  Recipe recipe = searchResults[index];
-                  return Card(
-                    margin: EdgeInsets.all(10.0),
-                    child: ListTile(
-                      title: Text(recipe.title),
-                      subtitle: Text(recipe.description),
-                      leading: Image.network(recipe.imageUrl),
-                      trailing: Text("By ${recipe.creator}"),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecipeDetailPage(recipe: recipe),
-                          ),
-                        );
-                      },
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('recipes')
+          .where('title', isGreaterThanOrEqualTo: searchQuery)
+          .where('title', isLessThanOrEqualTo: searchQuery + '\uf8ff')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No results found", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)));
+        }
+        List<Recipe> searchResults = snapshot.data!.docs.map((doc) {
+          return Recipe.fromFirestore(doc);
+        }).toList();
+
+        return ListView.builder(
+          itemCount: searchResults.length,
+          itemBuilder: (context, index) {
+            Recipe recipe = searchResults[index];
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+              child: ListTile(
+                title: Text(recipe.name, style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(recipe.description),
+                leading: Image.network(
+                  recipe.imageUrl,
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.cover,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecipeDetailScreen(recipe: recipe),
                     ),
                   );
                 },
-              )
-            : Center(
-                child: Text("Tidak ditemukan"),
-              )
-        : Container();
-  }
-}
-
-class RecipeDetailPage extends StatelessWidget {
-  final Recipe recipe;
-
-  RecipeDetailPage({required this.recipe});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(recipe.title),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(recipe.imageUrl),
-            SizedBox(height: 16.0),
-            Text(
-              recipe.title,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              recipe.description,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              'By ${recipe.creator}',
-              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-            ),
-          ],
-        ),
-      ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
