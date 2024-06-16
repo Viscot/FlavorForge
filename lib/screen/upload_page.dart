@@ -1,16 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UploadPage extends StatefulWidget {
   @override
   _UploadPageState createState() => _UploadPageState();
 }
 
-class _UploadPageState extends State<UploadPage> with SingleTickerProviderStateMixin {
+class _UploadPageState extends State<UploadPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  List<TextEditingController> _instructionsController = [];
   List<TextEditingController> _ingredientControllers = [];
   File? _image;
   late AnimationController _animationController;
@@ -40,10 +46,65 @@ class _UploadPageState extends State<UploadPage> with SingleTickerProviderStateM
     });
   }
 
+  Future<void> _uploadRecipe() async {
+    if (_formKey.currentState!.validate()) {
+      // Upload image to Firebase Storage
+      String? imageUrl;
+      if (_image != null) {
+        final storageRef = FirebaseStorage.instance.ref().child(
+            'recipe_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+        final uploadTask = storageRef.putFile(_image!);
+        final snapshot = await uploadTask.whenComplete(() => {});
+        imageUrl = await snapshot.ref.getDownloadURL();
+      }
+
+      DocumentReference user = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+
+      // Collect ingredients
+      List<String> ingredients =
+          _ingredientControllers.map((controller) => controller.text).toList();
+
+      List<String> instructions =
+          _instructionsController.map((controller) => controller.text).toList();
+
+      _ingredientControllers.map((controller) => controller.text).toList();
+
+      // Create a new recipe document
+      await FirebaseFirestore.instance.collection('recipes').add({
+        'title': _nameController.text,
+        'description': _descriptionController.text,
+        'instructions': instructions,
+        'ingredients': ingredients,
+        'imageUrl': imageUrl,
+        'likesCount': 0,
+        'commentsCount': 0,
+        'authorId': user,
+        'createdAt': Timestamp.now(),
+      });
+
+      // Clear the form
+      _nameController.clear();
+      _descriptionController.clear();
+      _instructionsController.clear();
+      _ingredientControllers.forEach((controller) => controller.clear());
+      setState(() {
+        _image = null;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Recipe uploaded successfully')));
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    for (var controller in _instructionsController) {
+      controller.dispose();
+    }
     for (var controller in _ingredientControllers) {
       controller.dispose();
     }
@@ -135,6 +196,61 @@ class _UploadPageState extends State<UploadPage> with SingleTickerProviderStateM
                 ),
                 SizedBox(height: 16.0),
                 Text(
+                  'Instructions',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                ..._instructionsController.map((controller) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: FadeTransition(
+                      opacity: _animation,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: controller,
+                              decoration: InputDecoration(
+                                labelText: 'Intructions',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Ingredient cannot be empty';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                _ingredientControllers.remove(controller);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _instructionsController.add(TextEditingController());
+                      _animationController.forward(from: 0);
+                    });
+                  },
+                  icon: Icon(Icons.add),
+                  label: Text('Add Intructions'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Text(
                   'Ingredients',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -190,19 +306,7 @@ class _UploadPageState extends State<UploadPage> with SingleTickerProviderStateM
                 ),
                 SizedBox(height: 16.0),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Handle form submission
-                      print('Recipe Name: ${_nameController.text}');
-                      print('Description: ${_descriptionController.text}');
-                      _ingredientControllers.forEach((controller) {
-                        print('Ingredient: ${controller.text}');
-                      });
-                      if (_image != null) {
-                        print('Image Path: ${_image!.path}');
-                      }
-                    }
-                  },
+                  onPressed: _uploadRecipe,
                   child: Text('Upload'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepOrange,
