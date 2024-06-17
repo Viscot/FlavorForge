@@ -1,15 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'dart:async';
 import 'home_page.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  double _opacity = 0.0;
+  double _logoSize = 100.0; // Initial size of the logo
+  late AnimationController _controller;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, 1),
+      end: Offset(0, 0),
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+
+    _animateSplash();
+    Timer(Duration(seconds: 3), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    });
+  }
+
+  void _animateSplash() {
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        _opacity = 1.0;
+      });
+      _controller.forward();
+      // Enlarge the logo to the final size
+      setState(() {
+        _logoSize = 150.0;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [const Color.fromARGB(255, 243, 100, 33), Color.fromARGB(255, 210, 47, 18)],
+            colors: [Colors.orange, Colors.red],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -17,70 +69,43 @@ class SplashScreen extends StatelessWidget {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Image.network(
-                'https://media.discordapp.net/attachments/1010915481990991943/1251892489535881286/logoff-removebg-preview.png?ex=66703b3c&is=666ee9bc&hm=d9885f5cd3d9924e9e25e8aa2df970bdb94960dfd34841c1233d2adf5b841ccf&=&format=webp&quality=lossless&width=546&height=437', // Ganti URL ini dengan URL gambar yang diinginkan
-                width: 200,
-                height: 200,
-              ),
-              SizedBox(height: 20),
-              Text(
-                'FLAVOR FORGE',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            children: [
+              AnimatedContainer(
+                duration: Duration(seconds: 2),
+                curve: Curves.easeInOut,
+                width: _logoSize,
+                height: _logoSize,
+                child: Image.network(
+                  'https://media.discordapp.net/attachments/1010915481990991943/1252102850981662750/LOGO.png?ex=6670ff26&is=666fada6&hm=79066ca37aa2f401ca21d497b0149fd21ade84ac812dc562fbfe941a928df160&=&format=webp&quality=lossless&width=437&height=437', // Replace with your logo URL
                 ),
               ),
               SizedBox(height: 20),
-              CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              FadeTransition(
+                opacity: _controller,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Text(
+                    'WELCOME TO FLAVOR FORGE',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: 20),
-              AnimatedTextKit(
-                animatedTexts: [
-                  TypewriterAnimatedText(
-                    'Loading...',
-                    textStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    speed: Duration(milliseconds: 200),
-                  ),
-                ],
-                totalRepeatCount: 1,
+              AnimatedOpacity(
+                opacity: _opacity,
+                duration: Duration(seconds: 2),
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
-  }
-}
-
-class SplashScreenPage extends StatefulWidget {
-  @override
-  _SplashScreenPageState createState() => _SplashScreenPageState();
-}
-
-class _SplashScreenPageState extends State<SplashScreenPage> {
-  @override
-  void initState() {
-    super.initState();
-    _navigateToHome();
-  }
-
-  _navigateToHome() async {
-    await Future.delayed(Duration(seconds: 3), () {});
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SplashScreen();
   }
 }
