@@ -5,7 +5,7 @@ import 'screen/favorite_page.dart';
 import 'screen/upload_page.dart';
 import 'screen/profile_page.dart';
 import 'screen/search_page.dart';
-//import 'screen/splash_screen.dart';
+import 'screen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainPage(),
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false, // Menyembunyikan banner debug
     );
   }
