@@ -1,3 +1,5 @@
+// lib/screen/splash_screen.dart
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'home_page.dart';
@@ -75,8 +77,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 curve: Curves.easeInOut,
                 width: _logoSize,
                 height: _logoSize,
-                child: Image.network(
-                  'https://media.discordapp.net/attachments/1010915481990991943/1252102850981662750/LOGO.png?ex=6670ff26&is=666fada6&hm=79066ca37aa2f401ca21d497b0149fd21ade84ac812dc562fbfe941a928df160&=&format=webp&quality=lossless&width=437&height=437', // Replace with your logo URL
+                child: Image.asset(
+                  'asset/images/splash.png', // Path to your local image
                 ),
               ),
               SizedBox(height: 20),
